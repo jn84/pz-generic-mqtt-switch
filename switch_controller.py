@@ -90,7 +90,7 @@ except TypeError as e:
 
 
 logger = get_timed_rotating_logger(config.SWITCH_NAME,
-                                   logging.DEBUG)
+                                   logging.WARNING)
 
 logger.info('Configuration file successfully loaded')
 logger.info('Initializing switch handler...')
@@ -122,7 +122,8 @@ def on_disconnect(client_local, userdata, rc):
 def on_message(client_local, userdata, msg):
     # Should only get messages from subscribed topic
     # Should convert state message to bool
-    state = parse_bool_payload(bool(msg.payload))
+    # Payload strings are byte arrays. Need to decode them.
+    state = parse_bool_payload(msg.payload.decode())
     logger.info('Set switch state message received. Sending command to switch handler.')
     switch.set_state(state)
 
@@ -135,17 +136,13 @@ def on_switch_state_change(state):
 
 
 def on_switch_handler_message(message):
-    logger.info(message)
+    logger.debug(message)
 
 
 def parse_bool_payload(state_payload):
-    if type(state_payload) is str:
-        state = state_payload.lower()
-        return state == 'on' or state == 'high' or state == '1' or state == 'true'
-    if type(state_payload) is int:
-        return state_payload != 0
-    # Now assumed boolean
-    return state_payload
+    # Payloads are always 'True' or 'False' strings
+    state = state_payload.lower()
+    return state == 'true'
 
 
 switch.on_state_change = on_switch_state_change
