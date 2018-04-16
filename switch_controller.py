@@ -90,7 +90,7 @@ except TypeError as e:
 
 
 logger = get_timed_rotating_logger(config.SWITCH_NAME,
-                                   logging.WARNING)
+                                   LOG_LEVEL)
 
 logger.info('Configuration file successfully loaded')
 logger.info('Initializing switch handler...')
