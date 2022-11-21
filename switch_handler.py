@@ -1,4 +1,5 @@
-import RPi.GPIO as GPIO
+from digitalio import DigitalInOut, Direction
+import board
 import string
 
 
@@ -7,7 +8,11 @@ class GenericSwitchHandler:
 
     VERSION = '0.1a'
 
-    # BCM pin of switch control relay
+    # Main switch object
+    _switch = None
+
+    # XXX BCM pin of switch control relay
+    # (adafruit) Board pin
     _gpio_switch_control_pin = -1
 
     # [ON] state of the relay IO
@@ -28,10 +33,13 @@ class GenericSwitchHandler:
 
         self._current_state = not self._gpio_switch_control_active
 
-        GPIO.setmode(GPIO.BCM)
+        self._switch = DigitalInOut(board.D19)
+        self._switch.direction = Direction.OUTPUT
+        #GPIO.setmode(GPIO.BCM)
 
         # Set initial state to OFF (not active)
-        GPIO.setup(self._gpio_switch_control_pin, GPIO.OUT, initial=int(self._current_state))
+        self._switch.value = self._current_state
+        #GPIO.setup(self._gpio_switch_control_pin, GPIO.OUT, initial=int(self._current_state))
 
     # Callers will simply say ON, OFF; HIGH, LOW; 1, 0; True, False
     # They need no knowledge of inverted outputs
@@ -49,7 +57,8 @@ class GenericSwitchHandler:
         # Turn it on
         self._current_state = new_state
 
-        GPIO.output(self._gpio_switch_control_pin, int(self._current_state))
+        self._switch.value = self._current_state
+        #GPIO.output(self._gpio_switch_control_pin, int(self._current_state))
         self.log('Handler: State updated to ' + str(self._current_state) + ' and type ' + str(type(self._current_state)))
         # Trigger callback
 
@@ -76,5 +85,6 @@ class GenericSwitchHandler:
             self.on_log_message(message)
 
     def cleanup(self):
-        GPIO.cleanup()
+        self.log("Cleanup function obsolete")
+        #GPIO.cleanup()
 

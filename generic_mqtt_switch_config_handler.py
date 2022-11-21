@@ -2,6 +2,7 @@ import configparser
 
 from random import choice
 
+#
 
 class GenericSwitchConfigurationHandler:
     SWITCH_NAME = None  # type: str

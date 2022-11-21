@@ -171,7 +171,7 @@ else:
 logger.info('MQTT successfully configured')
 logger.info('Creating MQTT connection to host: ' + config.MQTT_HOST)
 
-client.connect(config.MQTT_HOST, port=config.get_port(), keepalive=60)
+client.connect_async(config.MQTT_HOST, port=config.get_port(), keepalive=60)
 
 try:
     client.loop_forever()
